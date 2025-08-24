@@ -13,10 +13,8 @@ type cliCommand struct {
 	callback    func() error
 }
 
-var commandRegistry map[string]cliCommand
-
-func init() {
-	commandRegistry = map[string]cliCommand{
+func getCommands() map[string]cliCommand {
+	return map[string]cliCommand{
 		"help": {
 			name:        "help",
 			description: "Displays a help message",
@@ -43,8 +41,8 @@ func startRepl() {
 		}
 
 		commandName := words[0]
-		command, ok := commandRegistry[commandName]
-		if !ok {
+		command, exists := getCommands()[commandName]
+		if !exists {
 			fmt.Println("Unknown command")
 			continue
 		}
@@ -64,18 +62,18 @@ func cleanInput(text string) []string {
 func commandExit() error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
-
 	return nil
 }
 
 func commandHelp() error {
+	fmt.Println("")
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println("")
-
-	for cmd, val := range commandRegistry {
-		fmt.Printf("%s: %s\n", cmd, val.description)
+	for _, cmd := range getCommands() {
+		fmt.Printf("%s: %s\n", cmd.name, cmd.description)
 	}
+	fmt.Println("")
 
 	return nil
 }
