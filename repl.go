@@ -7,6 +7,20 @@ import (
 	"strings"
 )
 
+type cliCommand struct {
+	name        string
+	description string
+	callback    func() error
+}
+
+var commandRegistry = map[string]cliCommand{
+	"exit": {
+		name:        "exit",
+		description: "Exit the Pokedex",
+		callback:    commandExit,
+	},
+}
+
 func startRepl() {
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -20,8 +34,15 @@ func startRepl() {
 		}
 
 		commandName := words[0]
-
-		fmt.Printf("Your command was: %s\n", commandName)
+		command, ok := commandRegistry[commandName]
+		if !ok {
+			fmt.Println("Unknown command")
+			continue
+		}
+		err := command.callback()
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }
 
@@ -29,4 +50,11 @@ func cleanInput(text string) []string {
 	lowerText := strings.ToLower(text)
 	words := strings.Fields(lowerText)
 	return words
+}
+
+func commandExit() error {
+	fmt.Println("Closing the Pokedex... Goodbye!")
+	os.Exit(0)
+
+	return nil
 }
