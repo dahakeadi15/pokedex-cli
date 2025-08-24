@@ -1,43 +1,25 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 )
 
-func commandMapb(config *Config) error {
-	if config.Previous == "" {
-		fmt.Println("you're on the first page")
-		return nil
+func commandMapb(cfg *config) error {
+	if cfg.prevLocationAreasURL == nil {
+		return fmt.Errorf("you're on the first page")
 	}
 
-	res, err := http.Get(config.Previous)
+	locationAreas, err := cfg.pokeapiClient.ListLocationAreas(cfg.prevLocationAreasURL)
 	if err != nil {
-		return fmt.Errorf("error fetching location areas: %w", err)
-	}
-	defer res.Body.Close()
-
-	body, err := io.ReadAll(res.Body)
-	if res.StatusCode > 299 {
-		return fmt.Errorf("error fetching location areas: api failed with code %d and body - %s", res.StatusCode, body)
-	}
-	if err != nil {
-		return fmt.Errorf("error reading body: %w", err)
+		return err
 	}
 
-	apiRes := ApiResponse{}
-	if err := json.Unmarshal(body, &apiRes); err != nil {
-		return fmt.Errorf("error parsing data: %w", err)
-	}
-
-	for _, locationArea := range apiRes.Results {
+	for _, locationArea := range locationAreas.Results {
 		fmt.Println(locationArea.Name)
 	}
 
-	config.Next = apiRes.Next
-	config.Previous = apiRes.Previous
+	cfg.nextLocationAreasURL = locationAreas.Next
+	cfg.prevLocationAreasURL = locationAreas.Previous
 
 	return nil
 }

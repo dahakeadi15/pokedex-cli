@@ -23,7 +23,7 @@ func (c *Client) ListLocationAreas(pageURL *string) (ApiRespLocationAreas, error
 	}
 	defer res.Body.Close()
 
-	body, err := io.ReadAll(req.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return ApiRespLocationAreas{}, err
 	}
