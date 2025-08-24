@@ -13,12 +13,21 @@ type cliCommand struct {
 	callback    func() error
 }
 
-var commandRegistry = map[string]cliCommand{
-	"exit": {
-		name:        "exit",
-		description: "Exit the Pokedex",
-		callback:    commandExit,
-	},
+var commandRegistry map[string]cliCommand
+
+func init() {
+	commandRegistry = map[string]cliCommand{
+		"help": {
+			name:        "help",
+			description: "Displays a help message",
+			callback:    commandHelp,
+		},
+		"exit": {
+			name:        "exit",
+			description: "Exit the Pokedex",
+			callback:    commandExit,
+		},
+	}
 }
 
 func startRepl() {
@@ -55,6 +64,18 @@ func cleanInput(text string) []string {
 func commandExit() error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
+
+	return nil
+}
+
+func commandHelp() error {
+	fmt.Println("Welcome to the Pokedex!")
+	fmt.Println("Usage:")
+	fmt.Println("")
+
+	for cmd, val := range commandRegistry {
+		fmt.Printf("%s: %s\n", cmd, val.description)
+	}
 
 	return nil
 }
