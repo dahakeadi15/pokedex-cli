@@ -1,0 +1,43 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+)
+
+func commandMapb(config *Config) error {
+	if config.Previous == "" {
+		fmt.Println("you're on the first page")
+		return nil
+	}
+
+	res, err := http.Get(config.Previous)
+	if err != nil {
+		return fmt.Errorf("error fetching locations: %w", err)
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if res.StatusCode > 299 {
+		return fmt.Errorf("error fetching locations: api failed with code %d and body - %s", res.StatusCode, body)
+	}
+	if err != nil {
+		return fmt.Errorf("error reading body: %w", err)
+	}
+
+	apiRes := ApiResponse{}
+	if err := json.Unmarshal(body, &apiRes); err != nil {
+		return fmt.Errorf("error parsing data: %w", err)
+	}
+
+	for _, location := range apiRes.Results {
+		fmt.Println(location.Name)
+	}
+
+	config.Next = apiRes.Next
+	config.Previous = apiRes.Previous
+
+	return nil
+}
