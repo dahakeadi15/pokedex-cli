@@ -10,7 +10,7 @@ import (
 type ApiResponse struct {
 	Count    uint
 	Next     string
-	Previous any
+	Previous string
 	Results  []Location
 }
 
@@ -19,8 +19,8 @@ type Location struct {
 	URL  string
 }
 
-func commandMap() error {
-	res, err := http.Get("https://pokeapi.co/api/v2/location")
+func commandMap(config *Config) error {
+	res, err := http.Get(config.Next)
 	if err != nil {
 		return fmt.Errorf("error fetching locations: %w", err)
 	}
@@ -42,6 +42,9 @@ func commandMap() error {
 	for _, location := range apiRes.Results {
 		fmt.Println(location.Name)
 	}
+
+	config.Next = apiRes.Next
+	config.Previous = apiRes.Previous
 
 	return nil
 }
