@@ -46,7 +46,7 @@ func getCommands() map[string]cliCommand {
 func startRepl() {
 	scanner := bufio.NewScanner(os.Stdin)
 	config := Config{
-		Next:     "https://pokeapi.co/api/v2/location?offset=0&limit=20",
+		Next:     "https://pokeapi.co/api/v2/location-area?offset=0&limit=20",
 		Previous: "",
 	}
 
