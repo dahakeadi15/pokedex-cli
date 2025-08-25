@@ -32,7 +32,7 @@ func (c *Client) GetPokemon(pokemonName string) (Pokemon, error) {
 
 	pokemonResp := Pokemon{}
 	if err := json.Unmarshal(data, &pokemonResp); err != nil {
-		return Pokemon{}, nil
+		return Pokemon{}, err
 	}
 	return pokemonResp, nil
 }
