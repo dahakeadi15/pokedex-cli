@@ -12,8 +12,8 @@ func commandCatch(cfg *config, args ...string) error {
 		return errors.New("you must provide a pokemon name")
 	}
 
-	pokemonName := args[0]
-	pokemonInfo, err := cfg.pokeapiClient.GetPokemon(pokemonName)
+	name := args[0]
+	pokemon, err := cfg.pokeapiClient.GetPokemon(name)
 	if err != nil {
 		if strings.HasPrefix(err.Error(), "invalid character") {
 			return errors.New("no such pokemon exist in the database")
@@ -21,19 +21,17 @@ func commandCatch(cfg *config, args ...string) error {
 		return err
 	}
 
-	fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
+	chance := rand.Intn(pokemon.BaseExperience)
 
-	pokemonBaseXp := pokemonInfo.BaseExperience
-	chance := rand.Intn(pokemonBaseXp)
-
-	percentChance := (float64(chance) / float64(pokemonBaseXp)) * 100.0
-
-	if percentChance > 60.0 {
-		cfg.pokemon[pokemonName] = pokemonInfo
-		fmt.Printf("%s was caught!\n", pokemonName)
-	} else {
-		fmt.Printf("%s escaped!\n", pokemonName)
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemon.Name)
+	if chance > 40 {
+		fmt.Printf("%s escaped!\n", pokemon.Name)
+		return nil
 	}
+
+	fmt.Printf("%s was caught!\n", pokemon.Name)
+
+	cfg.caughtPokemon[pokemon.Name] = pokemon
 
 	return nil
 }

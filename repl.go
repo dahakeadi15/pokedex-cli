@@ -22,12 +22,12 @@ func getCommands() map[string]cliCommand {
 		},
 		"map": {
 			name:        "map",
-			description: "Displays a list of 20 location areas. Each subsequent call displays the NEXT 20 locations.",
+			description: "Get the next page of location areas",
 			callback:    commandMapf,
 		},
 		"mapb": {
 			name:        "mapb",
-			description: "Displays a list of 20 location areas. Each subsequent call displays the PREVIOUS 20 locations.",
+			description: "Get the previous page of location areas",
 			callback:    commandMapb,
 		},
 		"explore": {
@@ -37,7 +37,7 @@ func getCommands() map[string]cliCommand {
 		},
 		"catch": {
 			name:        "catch",
-			description: "Catch a pokemon",
+			description: "Attempt to catch a pokemon",
 			callback:    commandCatch,
 		},
 		"exit": {
