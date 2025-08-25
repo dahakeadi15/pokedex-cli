@@ -10,7 +10,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config, string) error
+	callback    func(*config, ...string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -56,18 +56,17 @@ func startRepl(cfg *config) {
 		}
 
 		commandName := words[0]
+		args := []string{}
+		if len(words) > 1 {
+			args = words[1:]
+		}
+
 		command, exists := getCommands()[commandName]
 		if !exists {
 			fmt.Println("Unknown command")
 			continue
 		}
-
-		commandArg := ""
-		if len(words) > 1 {
-			commandArg = words[1]
-		}
-
-		err := command.callback(cfg, commandArg)
+		err := command.callback(cfg, args...)
 		if err != nil {
 			fmt.Println(err)
 		}
