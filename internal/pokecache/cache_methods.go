@@ -5,25 +5,19 @@ import (
 )
 
 func (c *Cache) Add(key string, val []byte) {
-	entry := cacheEntry{}
-
-	entry.createdAt = time.Now()
-	entry.val = val
-
 	c.mu.Lock()
-	c.cacheEntries[key] = entry
-	c.mu.Unlock()
+	defer c.mu.Unlock()
+	c.cacheEntries[key] = cacheEntry{
+		createdAt: time.Now().UTC(),
+		val:       val,
+	}
 }
 
 func (c *Cache) Get(key string) ([]byte, bool) {
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	entry, exists := c.cacheEntries[key]
-	c.mu.Unlock()
-	if !exists {
-		return nil, false
-	}
-
-	return entry.val, true
+	return entry.val, exists
 }
 
 func (c *Cache) reapLoop(interval time.Duration) {
