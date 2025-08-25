@@ -16,7 +16,7 @@ func NewCache(interval time.Duration) Cache {
 		mu:           &sync.Mutex{},
 	}
 
-	c.reapLoop(interval)
+	go c.reapLoop(interval)
 
 	return c
 }

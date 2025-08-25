@@ -22,17 +22,17 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 
 func (c *Cache) reapLoop(interval time.Duration) {
 	ticker := time.NewTicker(interval)
+	for range ticker.C {
+		c.reap(time.Now().UTC(), interval)
+	}
+}
 
-	go func() {
-		for t := range ticker.C {
-			c.mu.Lock()
-			for key, val := range c.cacheEntries {
-				lastTick := t.Add(-interval)
-				if val.createdAt.Before(lastTick) {
-					delete(c.cacheEntries, key)
-				}
-			}
-			c.mu.Unlock()
+func (c *Cache) reap(now time.Time, last time.Duration) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	for key, val := range c.cacheEntries {
+		if val.createdAt.Before(now.Add(-last)) {
+			delete(c.cacheEntries, key)
 		}
-	}()
+	}
 }
