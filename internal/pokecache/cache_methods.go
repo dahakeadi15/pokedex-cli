@@ -26,14 +26,14 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 	return entry.val, true
 }
 
-func (c *Cache) reapLoop() {
-	ticker := time.NewTicker(c.interval)
+func (c *Cache) reapLoop(interval time.Duration) {
+	ticker := time.NewTicker(interval)
 
 	go func() {
 		for t := range ticker.C {
 			c.mu.Lock()
 			for key, val := range c.cacheEntries {
-				lastTick := t.Add(-c.interval)
+				lastTick := t.Add(-interval)
 				if val.createdAt.Before(lastTick) {
 					delete(c.cacheEntries, key)
 				}

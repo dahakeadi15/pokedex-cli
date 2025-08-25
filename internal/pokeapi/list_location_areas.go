@@ -4,17 +4,15 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-
-	"github.com/dahakeadi15/pokedex-cli/internal/pokecache"
 )
 
-func (c *Client) ListLocationAreas(pageURL *string, cache pokecache.Cache) (ApiRespLocationAreas, error) {
+func (c *Client) ListLocationAreas(pageURL *string) (ApiRespLocationAreas, error) {
 	url := baseURL + "/location-area"
 	if pageURL != nil {
 		url = *pageURL
 	}
 
-	data, exists := cache.Get(url)
+	data, exists := c.cache.Get(url)
 	if !exists {
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
@@ -27,12 +25,12 @@ func (c *Client) ListLocationAreas(pageURL *string, cache pokecache.Cache) (ApiR
 		}
 		defer res.Body.Close()
 
-		body, err := io.ReadAll(res.Body)
+		data, err = io.ReadAll(res.Body)
 		if err != nil {
 			return ApiRespLocationAreas{}, err
 		}
-		data = body
-		cache.Add(url, data)
+
+		c.cache.Add(url, data)
 	}
 
 	locationAreasResponse := ApiRespLocationAreas{}

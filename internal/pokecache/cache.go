@@ -7,20 +7,16 @@ import (
 
 type Cache struct {
 	cacheEntries map[string]cacheEntry
-	interval     time.Duration
 	mu           *sync.Mutex
 }
 
 func NewCache(interval time.Duration) Cache {
-	mu := &sync.Mutex{}
-
 	c := Cache{
 		cacheEntries: map[string]cacheEntry{},
-		interval:     interval,
-		mu:           mu,
+		mu:           &sync.Mutex{},
 	}
 
-	c.reapLoop()
+	c.reapLoop(interval)
 
 	return c
 }
